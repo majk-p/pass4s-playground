@@ -3,7 +3,6 @@
 //> using lib "com.ocadotechnology::pass4s-core:0.2.2"
 //> using lib "com.ocadotechnology::pass4s-high:0.2.2"
 //> using lib "com.ocadotechnology::pass4s-connector-sns:0.2.2"
-//> using lib "com.ocadotechnology::pass4s-extra:0.2.2"
 //> using lib "org.typelevel::log4cats-noop:2.5.0"
 
 package net.michalp.pass4splayground
@@ -17,7 +16,6 @@ import com.ocadotechnology.pass4s.connectors.sns.SnsConnector
 import com.ocadotechnology.pass4s.connectors.sns.SnsDestination
 import com.ocadotechnology.pass4s.core.Message
 import com.ocadotechnology.pass4s.core.Source
-import com.ocadotechnology.pass4s.extra.MessageProcessor
 import com.ocadotechnology.pass4s.high.Broker
 import org.typelevel.log4cats.Logger
 import org.typelevel.log4cats.LoggerFactory
@@ -49,7 +47,7 @@ object Producer extends IOApp {
 
       val message = Message(Message.Payload("hello world!", Map()), snsDestination)
 
-      IO.println(s"Sending one message to $snsDestination") *>
+      IO.println(s"Sending message $message to $snsDestination") *>
         broker.sender.sendOne(message) *>
         IO.println("Sent, exiting!").as(ExitCode.Success)
     }
