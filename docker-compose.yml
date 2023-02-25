@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   localstack:
-    container_name: "${LOCALSTACK_DOCKER_NAME-localstack_main}"
+    container_name: localstack_main
     image: localstack/localstack
     hostname: localhost.localstack.cloud
     ports:
@@ -14,13 +14,12 @@ services:
       - EAGER_SERVICE_LOADING=1
       - SKIP_SSL_CERT_DOWNLOAD=1
       - HOSTNAME_EXTERNAL=localhost.localstack.cloud
-      - DEBUG=1
     volumes:
       - "/tmp/localstack:/var/lib/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
   
   setup-resources:
-    image: mesosphere/aws-cli
+    image: localstack/localstack
     environment:
       - AWS_ACCESS_KEY_ID=test
       - AWS_SECRET_ACCESS_KEY=AWSSECRET
@@ -35,9 +34,8 @@ services:
         # Executing SQS
         aws sqs create-queue --queue-name local_queue
         # Subscribing to SNS to SQS
-        aws sns subscribe --topic-arn arn:aws:sns:eu-west-2:000000000000:local_sns --protocol sqs --notification-endpoint arn:aws:sqs:eu-west-2:000000000000:local_queue 
+        aws sns subscribe --attributes 'RawMessageDelivery=true' --topic-arn arn:aws:sns:eu-west-2:000000000000:local_sns --protocol sqs --notification-endpoint arn:aws:sqs:eu-west-2:000000000000:local_queue
         aws sqs get-queue-url --queue-name local_queue
-        aws sns publish --topic-arn arn:aws:sns:eu-west-2:000000000000:local_sns --message "hello!"
       "
     depends_on:
       - localstack

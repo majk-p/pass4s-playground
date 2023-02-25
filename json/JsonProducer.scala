@@ -45,7 +45,7 @@ object JsonProducer extends IOApp {
 
       val domainMessage = DomainMessage("hello world!", 10)
 
-      IO.println(s"Sending one message to $snsDestination") *>
+      IO.println(s"Sending message: $domainMessage to $snsDestination") *>
         domainMessageSender.sendOne(domainMessage) *>
         IO.println("Sent, exiting!").as(ExitCode.Success)
     }

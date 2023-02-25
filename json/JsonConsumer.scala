@@ -38,25 +38,19 @@ object JsonConsumer extends IOApp {
     sqsConnector.use { connector =>
       val broker = Broker.fromConnector(connector)
 
-      val processor = MessageProcessor.init[IO].effectful.bindBroker(broker)
+      val processor =
+        MessageProcessor
+          .init[IO]
+          .effectful
+          .bindBroker(broker)
+          .enrich(_.asJsonConsumer[DomainMessage])
 
       IO.println(s"Processor listening for messages on $sqsSource") *>
-        broker
-          .consumer(sqsSource)
-          .asJsonConsumer[DomainMessage]
-          .consume(IO.println)
-          .background
-          .void
+        processor
+          .handle(sqsSource) { message =>
+            IO.println(s"Received message: $message")
+          }
           .use(_ => IO.never)
-
-    // val processor = MessageProcessor.init[IO].effectful.bindBroker(broker).enrich(_.asJsonConsumer[DomainMessage])
-
-    // IO.println(s"Processor listening for messages on $sqsSource") *>
-    //   processor
-    //     .handle(sqsSource) { message =>
-    //       IO.println(message)
-    //     }
-    //     .use(_ => IO.never)
 
     }
 
