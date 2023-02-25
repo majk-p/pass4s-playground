@@ -7,6 +7,8 @@
 //> using lib "com.ocadotechnology::pass4s-extra:0.2.2"
 //> using lib "org.typelevel::log4cats-noop:2.5.0"
 
+package net.michalp.pass4splayground
+
 import com.ocadotechnology.pass4s.high.Broker
 import com.ocadotechnology.pass4s.connectors.sqs.SqsConnector
 import cats.effect.IOApp
@@ -28,7 +30,7 @@ import com.ocadotechnology.pass4s.connectors.sqs.SqsEndpoint
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider
 import org.typelevel.log4cats.noop.NoOpLogger
 
-object Consumer extends IOApp {
+object MessageProcessorConsumer extends IOApp {
 
   override def run(args: List[String]): IO[ExitCode] = {
     implicit val ioLogger: Logger[IO] = NoOpLogger[IO]
@@ -41,6 +43,7 @@ object Consumer extends IOApp {
     val sqsSource = SqsEndpoint(SqsUrl("http://localhost:4566/000000000000/local_queue"))
     sqsConnector.use { connector =>
       val broker = Broker.fromConnector(connector)
+
       val processor = MessageProcessor.init[IO].effectful.bindBroker(broker)
 
       IO.println(s"Processor listening for messages on $sqsSource") *>
