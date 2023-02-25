@@ -29,9 +29,9 @@ object JsonConsumer extends IOApp {
     implicit val ioLogger: Logger[IO] = NoOpLogger[IO]
 
     println(DomainMessage("test", 10))
-    val awsCreds = AwsBasicCredentials.create("test", "AWSSECRET");
+    val awsCredentials = AwsBasicCredentials.create("test", "AWSSECRET");
 
-    val credentialsProvider = StaticCredentialsProvider.create(awsCreds)
+    val credentialsProvider = StaticCredentialsProvider.create(awsCredentials)
     val sqsConnector =
       SqsConnector.usingLocalAwsWithDefaultAttributesProvider[IO](new URI("http://localhost:4566"), Region.EU_WEST_2, credentialsProvider)
     val sqsSource = SqsEndpoint(SqsUrl("http://localhost:4566/000000000000/local_queue"))
