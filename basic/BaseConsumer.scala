@@ -46,7 +46,7 @@ object BaseConsumer extends IOApp {
       IO.println(s"Processor listening for messages on $sqsSource") *>
         broker
           .consumer(sqsSource)
-          .consume(IO.println)
+          .consume(message => IO.println(s"Received message: $message"))
           .background
           .void
           .use(_ => IO.never)
