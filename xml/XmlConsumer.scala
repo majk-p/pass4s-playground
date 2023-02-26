@@ -4,7 +4,7 @@ import cats.effect.ExitCode
 import cats.effect.IO
 import cats.effect.IOApp
 import cats.implicits._
-import com.ocadotechnology.pass4s.circe.syntax._
+import com.ocadotechnology.pass4s.phobos.syntax._
 import com.ocadotechnology.pass4s.connectors.sqs.SqsConnector
 import com.ocadotechnology.pass4s.connectors.sqs.SqsEndpoint
 import com.ocadotechnology.pass4s.connectors.sqs.SqsSource
@@ -12,7 +12,7 @@ import com.ocadotechnology.pass4s.connectors.sqs.SqsUrl
 import com.ocadotechnology.pass4s.core.Source
 import com.ocadotechnology.pass4s.extra.MessageProcessor
 import com.ocadotechnology.pass4s.high.Broker
-import net.michalp.pass4splayground.DomainMessage
+import net.michalp.pass4splayground.XmlMessage
 import org.typelevel.log4cats.Logger
 import org.typelevel.log4cats.noop.NoOpLogger
 import software.amazon.awssdk.auth.credentials.AnonymousCredentialsProvider
@@ -23,7 +23,7 @@ import software.amazon.awssdk.regions.Region
 
 import java.net.URI
 
-object JsonConsumer extends IOApp {
+object XmlConsumer extends IOApp {
 
   override def run(args: List[String]): IO[ExitCode] = {
     implicit val ioLogger: Logger[IO] = NoOpLogger[IO]
@@ -42,7 +42,11 @@ object JsonConsumer extends IOApp {
           .init[IO]
           .effectful
           .bindBroker(broker)
-          .enrich(_.asJsonConsumer[DomainMessage])
+          .enrich(_.map(_.text))
+          .enrich(
+            _.mapM(rawText => IO.println(s"Raw message text: $rawText").as(rawText))
+          )
+          .enrich(_.asXmlConsumer[XmlMessage])
 
       IO.println(s"Processor listening for messages on $sqsSource") *>
         processor
