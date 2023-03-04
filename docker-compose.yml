@@ -36,6 +36,8 @@ services:
         # Subscribing to SNS to SQS
         aws sns subscribe --attributes 'RawMessageDelivery=true' --topic-arn arn:aws:sns:eu-west-2:000000000000:local_sns --protocol sqs --notification-endpoint arn:aws:sqs:eu-west-2:000000000000:local_queue
         aws sqs get-queue-url --queue-name local_queue
+        # Create na S3 bucket for large messages
+        aws s3 mb s3://large-messages
       "
     depends_on:
       - localstack
